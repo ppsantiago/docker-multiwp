@@ -1,0 +1,132 @@
+version: "2"
+services:
+  db:
+    image: mysql
+    restart: always
+    volumes:
+      - wp-database:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5" # Limita a 0.5 CPU
+          memory: 512M # Limita a 256 MB de memoria
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    networks:
+      - myNetwork
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8083:80
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5" # Limita a 0.5 CPU
+          memory: 512M # Limita a 256 MB de memoria
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    networks:
+      - myNetwork
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: admin
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - 8082:80
+    deploy:
+      resources:
+        limits:
+          cpus: "1" # Limita a 0.5 CPU
+          memory: 512m # Limita a 256 MB de memoria
+    volumes:
+      - wp-plugins:/var/www/html/wp-content/plugins
+      - wp-content:/var/www/html/wp-content/themes
+    networks:
+      - myNetwork
+
+  db2:
+    image: mysql
+    restart: always
+    volumes:
+      - wp-database2:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5" # Limita a 0.5 CPU
+          memory: 512M # Limita a 256 MB de memoria
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    networks:
+      - myNetwork2
+
+  phpmyadmin2:
+    depends_on:
+      - db2
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8086:80
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5" # Limita a 0.5 CPU
+          memory: 512M # Limita a 256 MB de memoria
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    networks:
+      - myNetwork2
+
+  wordpress2:
+    depends_on:
+      - db2
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db2
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: admin
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - 8085:80
+    deploy:
+      resources:
+        limits:
+          cpus: "1" # Limita a 0.5 CPU
+          memory: 512m # Limita a 256 MB de memoria
+    volumes:
+      - wp-plugins:/var/www/html/wp-content/plugins
+      - wp-content:/var/www/html/wp-content/themes
+    networks:
+      - myNetwork2
+
+networks:
+  myNetwork:
+  myNetwork2:
+volumes:
+  wp-database:
+  wp-database2:
+  wp-plugins:
+  wp-content:
